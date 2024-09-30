@@ -29,19 +29,30 @@ async function run(): Promise<void> {
     const state = getPostState()
 
     // Prepare cache set command with dynamic inputs
-    let cacheSetCommand = `npx currents cache set \
-        --key ${state.key} \
-        --preset last-run \
-        --id ${state.id} \
-        --pw-output-dir ${state.pwOutputDir} \
-        --matrix-index ${state.matrixIndex} \
-        --matrix-total ${state.matrixTotal}`
+    const options: string[] = [
+      `--preset last-run`,
+      `--matrix-index ${state.matrixIndex}`,
+      `--matrix-total ${state.matrixTotal}`
+    ]
 
-    if (state.debug) {
-      cacheSetCommand += ` --debug`
+    if (state.key) {
+      options.push(`--key ${state.key}`)
     }
 
-    // Execute cache set command
+    if (state.id) {
+      options.push(`--id ${state.id}`)
+    }
+
+    if (state.pwOutputDir) {
+      options.push(`--pw-output-dir ${state.pwOutputDir}`)
+    }
+
+    if (state.debug) {
+      options.push(`--debug`)
+    }
+
+    const cacheSetCommand = `npx currents cache set ${options.join(' ')}`
+
     await exec.exec(cacheSetCommand)
   } catch (error) {
     core.setFailed((error as Error).message)

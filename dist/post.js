@@ -26197,17 +26197,24 @@ async function run() {
     try {
         const state = getPostState();
         // Prepare cache set command with dynamic inputs
-        let cacheSetCommand = `npx currents cache set \
-        --key ${state.key} \
-        --preset last-run \
-        --id ${state.id} \
-        --pw-output-dir ${state.pwOutputDir} \
-        --matrix-index ${state.matrixIndex} \
-        --matrix-total ${state.matrixTotal}`;
-        if (state.debug) {
-            cacheSetCommand += ` --debug`;
+        const options = [
+            `--preset last-run`,
+            `--matrix-index ${state.matrixIndex}`,
+            `--matrix-total ${state.matrixTotal}`
+        ];
+        if (state.key) {
+            options.push(`--key ${state.key}`);
         }
-        // Execute cache set command
+        if (state.id) {
+            options.push(`--id ${state.id}`);
+        }
+        if (state.pwOutputDir) {
+            options.push(`--pw-output-dir ${state.pwOutputDir}`);
+        }
+        if (state.debug) {
+            options.push(`--debug`);
+        }
+        const cacheSetCommand = `npx currents cache set ${options.join(' ')}`;
         await exec.exec(cacheSetCommand);
     }
     catch (error) {

@@ -26198,30 +26198,30 @@ function getInputs() {
 async function run() {
     try {
         const inputs = getInputs();
-        // Install @currents/cmd globally
         await exec.exec('npm install -g @currents/cmd@beta');
         const presetOutput = '.currents_env';
-        // Prepare cache get command with dynamic inputs
-        let cacheGetCommand = `npx currents cache get \
-        --key ${inputs.key} \
-        --id ${inputs.id}
-        --preset last-run \
-        --preset-output ${presetOutput} \
-        --matrix-index ${inputs.matrixIndex} \
-        --matrix-total ${inputs.matrixTotal}
-        `;
+        const options = [
+            `--preset last-run`,
+            `--preset-output ${presetOutput}`,
+            `--matrix-index ${inputs.matrixIndex}`,
+            `--matrix-total ${inputs.matrixTotal}`
+        ];
+        if (inputs.key) {
+            options.push(`--key ${inputs.key}`);
+        }
+        if (inputs.id) {
+            options.push(`--id ${inputs.id}`);
+        }
         if (inputs.outputDir) {
-            cacheGetCommand += ` --output-dir ${inputs.outputDir}`;
+            options.push(`--output-dir ${inputs.outputDir}`);
         }
         if (inputs.debug) {
-            cacheGetCommand += ` --debug`;
+            options.push(`--debug`);
         }
-        // Execute cache get command
+        const cacheGetCommand = `npx currents cache get ${options.join(' ')}`;
         await exec.exec(cacheGetCommand);
-        // Capture and output extra Playwright flags
         const extraPwFlags = await exec.getExecOutput(`cat ${presetOutput}`);
         core.setOutput('extra-pw-flags', extraPwFlags.stdout.trim());
-        // Save state for post.js
         core.saveState('key', inputs.key);
         core.saveState('debug', inputs.debug);
         core.saveState('id', inputs.id);
