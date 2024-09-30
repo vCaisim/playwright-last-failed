@@ -26191,8 +26191,8 @@ function getInputs() {
         paths: core.getInput('paths'),
         outputDir: core.getInput('output-dir'),
         pwOutputDir: core.getInput('pw-output-dir') || 'test-results',
-        matrixIndex: core.getInput('matrix-index') || '0',
-        marixTotal: core.getInput('matrix-total') || '1'
+        matrixIndex: core.getInput('matrix-index') || '1',
+        matrixTotal: core.getInput('matrix-total') || '1'
     };
 }
 async function run() {
@@ -26212,7 +26212,7 @@ async function run() {
         --preset last-run \
         --preset-output ${presetOutput} \
         --matrix-index ${inputs.matrixIndex} \
-        --matrix-total ${inputs.marixTotal} \
+        --matrix-total ${inputs.matrixTotal}
         `;
         if (inputs.outputDir) {
             cacheGetCommand += ` --output-dir ${inputs.outputDir}`;
@@ -26229,7 +26229,7 @@ async function run() {
         core.saveState('paths', inputs.paths || '');
         core.saveState('pwOutputDir', inputs.pwOutputDir);
         core.saveState('matrixIndex', inputs.matrixIndex);
-        core.saveState('marixTotal', inputs.marixTotal);
+        core.saveState('matrixTotal', inputs.matrixTotal);
     }
     catch (error) {
         core.setFailed(error.message);
