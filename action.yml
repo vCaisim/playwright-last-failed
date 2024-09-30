@@ -1,24 +1,47 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Playwright Last Failed'
+description:
+  'The action helps to run last failed Playwright tests using Currents cache'
+author: 'vCaisim'
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
-branding:
-  icon: 'heart'
-  color: 'red'
-
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
-    required: true
-    default: '1000'
+  key:
+    description: 'Your secret Record Key obtained from Currents'
+    required: false
+    default: ''
+  debug:
+    description: 'Enable debug logging'
+    required: false
+    default: 'false'
+  id:
+    description: 'The ID the data is saved under in the cache'
+    required: false
+    default: ''
+  paths:
+    description: 'Comma-separated list of paths to cache'
+    required: false
+    default: ''
+  output-dir:
+    description: 'Path to the directory where output will be written'
+    required: false
+    default: ''
+  pw-output-dir:
+    description: 'Directory for artifacts produced by Playwright tests'
+    required: false
+    default: 'test-results'
+  matrix-index:
+    description: 'The index of the matrix to use'
+    required: false
+    default: '1'
+  matrix-total:
+    description: 'The total number of matrices available'
+    required: false
+    default: '1'
 
-# Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  extra-pw-flags:
+    description: "Extra flags to pass to Playwright's test runner"
 
 runs:
   using: node20
   main: dist/index.js
+  post: dist/post.js
