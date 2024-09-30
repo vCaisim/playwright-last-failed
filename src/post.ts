@@ -29,13 +29,17 @@ async function run(): Promise<void> {
     const state = getPostState()
 
     // Prepare cache set command with dynamic inputs
-    const cacheSetCommand = `npx currents cache set \
+    let cacheSetCommand = `npx currents cache set \
         --key ${state.key} \
         --preset last-run \
         --id ${state.id} \
         --pw-output-dir ${state.pwOutputDir} \
         --matrix-index ${state.matrixIndex} \
         --matrix-total ${state.matrixTotal}`
+
+    if (state.debug) {
+      cacheSetCommand += ` --debug`
+    }
 
     // Execute cache set command
     await exec.exec(cacheSetCommand)

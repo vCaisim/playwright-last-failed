@@ -33,11 +33,6 @@ async function run(): Promise<void> {
   try {
     const inputs = getInputs()
 
-    const envVars: { [key: string]: string } = {}
-    if (inputs.debug) {
-      envVars['DEBUG'] = 'currents,currents:*'
-    }
-
     // Install @currents/cmd globally
     await exec.exec('npm install -g @currents/cmd@beta')
 
@@ -56,8 +51,12 @@ async function run(): Promise<void> {
       cacheGetCommand += ` --output-dir ${inputs.outputDir}`
     }
 
+    if (inputs.debug) {
+      cacheGetCommand += ` --debug`
+    }
+
     // Execute cache get command
-    await exec.exec(cacheGetCommand, [], { env: envVars })
+    await exec.exec(cacheGetCommand)
 
     // Capture and output extra Playwright flags
     const extraPwFlags = await exec.getExecOutput(`cat ${presetOutput}`)
