@@ -1,7 +1,7 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "1.0.5",
+  "name": "playwright-last-failed",
+  "description": "GitHub Actions TypeScript template that runs last failed Playwright tests using Currents cache",
+  "version": "1.0.6",
   "author": "",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
