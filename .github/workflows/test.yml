@@ -1,0 +1,82 @@
+name: Test Action
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-action-sharding:
+    strategy:
+    fail-fast: false
+    matrix:
+      shard: [1, 2]
+    runs-on: ubuntu-latest
+    env:
+      CURRENTS_RECORD_KEY: ${{ secrets.CURRENTS_RECORD_KEY }}
+      CURRENTS_API_URL: ${{ secrets.CURRENTS_API_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Print inputs for debugging (Sharding)
+        run: |
+          echo "Key: ${{ env.CURRENTS_RECORD_KEY }}"
+          echo "Matrix Index: ${{ matrix.shard }}"
+          echo "Matrix Total: ${{ matrix.job-total }}"
+
+      - name: Run My Action (Sharding)
+        id: sharding_action
+        uses: ./
+        with:
+          debug: true
+          pw-output-dir: basic/test-results
+          matrix-index: ${{ matrix.shard }}
+          matrix-total: ${{ matrix.job-total }}
+
+      - name: Verify Action Output (Sharding)
+        run: |
+          echo "Extra Playwright Flags: ${{ steps.sharding_action.outputs.extra-pw-flags }}"
+
+  test-action-or8n:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+      runs-on: ubuntu-latest
+    env:
+      CURRENTS_PROJECT_ID: ${{ secrets.CURRENTS_PROJECT_ID }}
+      CURRENTS_API_KEY: ${{ secrets.CURRENTS_API_KEY }}
+      CURRENTS_REST_API_URL: ${{ secrets.CURRENTS_REST_API_URL }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Print inputs for debugging (Or8n)
+        run: |
+          echo "API Key: ${{ env.CURRENTS_API_KEY }}"
+          echo "Project ID: ${{ env.CURRENTS_PROJECT_ID }}"
+
+      - name: Run My Action (Or8n)
+        id: or8n_action
+        uses: ./
+        with:
+          or8n: true
+          api-key: ${{ env.CURRENTS_API_KEY }}
+          project-id: ${{ env.CURRENTS_PROJECT_ID }}
+          pw-output-dir: basic/test-results
+
+      - name: Verify Action Output (Or8n)
+        run: |
+          echo "Extra Playwright Flags: ${{ steps.or8n_action.outputs.extra-pw-flags }}"

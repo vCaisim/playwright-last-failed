@@ -26182,15 +26182,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
+const path = __importStar(__nccwpck_require__(6928));
 // Get inputs with types
 function getInputs() {
     return {
+        or8n: parseYamlBoolean(core.getInput('or8n')) ?? false,
+        debug: parseYamlBoolean(core.getInput('debug')) ?? false,
+        apiKey: core.getInput('api-key') ?? process.env.CURRENTS_API_KEY,
+        projectId: core.getInput('project-id') ?? process.env.CURRENTS_PROJECT_ID,
+        previousCIBuildId: core.getInput('previous-ci-build-id'),
         key: core.getInput('key') ?? process.env.CURRENTS_RECORD_KEY,
-        debug: core.getBooleanInput('debug'),
         id: core.getInput('id'),
         paths: core.getInput('paths'),
         outputDir: core.getInput('output-dir'),
-        pwOutputDir: core.getInput('pw-output-dir') || 'test-results',
+        pwOutputDir: core.getInput('pw-output-dir'),
         matrixIndex: core.getInput('matrix-index') || '1',
         matrixTotal: core.getInput('matrix-total') || '1'
     };
@@ -26199,6 +26204,11 @@ async function run() {
     try {
         const inputs = getInputs();
         await exec.exec('npm install -g @currents/cmd@beta');
+        core.saveState('or8n', inputs.or8n);
+        if (inputs.or8n) {
+            await or8n(inputs);
+            return;
+        }
         const presetOutput = '.currents_env';
         const options = [
             `--preset last-run`,
@@ -26233,6 +26243,65 @@ async function run() {
     catch (error) {
         core.setFailed(error.message);
     }
+}
+async function or8n(inputs) {
+    const runAttempt = parseIntSafe(process.env.GITHUB_RUN_ATTEMPT, 1);
+    if (runAttempt > 1) {
+        let previousBuildId = inputs.previousCIBuildId;
+        if (!previousBuildId) {
+            const repository = process.env.GITHUB_REPOSITORY;
+            const runId = process.env.GITHUB_RUN_ID;
+            const previousRunAttempt = runAttempt - 1;
+            previousBuildId = `${repository}-${runId}-${previousRunAttempt}`;
+        }
+        const lastRunFilePath = path.resolve(inputs.pwOutputDir ?? 'test-results', '.last-run.json');
+        const options = [
+            `--pw-last-run`,
+            `--ci-build-id`,
+            `${previousBuildId}`,
+            `--output`,
+            `${lastRunFilePath}`
+        ];
+        const exitCode = await exec.exec(`npx currents api get-run ${options.join(' ')}`);
+        if (exitCode === 0) {
+            core.setOutput('extra-pw-flags', '--last-failed');
+        }
+    }
+}
+const parseIntSafe = (value, defaultValue) => {
+    const parsed = Number(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+};
+function parseYamlBoolean(value) {
+    const trueValues = [
+        'true',
+        'True',
+        'TRUE',
+        'yes',
+        'Yes',
+        'YES',
+        'on',
+        'On',
+        'ON'
+    ];
+    const falseValues = [
+        'false',
+        'False',
+        'FALSE',
+        'no',
+        'No',
+        'NO',
+        'off',
+        'Off',
+        'OFF'
+    ];
+    if (trueValues.includes(value)) {
+        return true;
+    }
+    else if (falseValues.includes(value)) {
+        return false;
+    }
+    return null;
 }
 run();
 

@@ -36,6 +36,22 @@ inputs:
     description: 'The total number of matrices available'
     required: false
     default: '1'
+  or8n:
+    description: 'Enable or8n integration'
+    required: false
+    default: 'false'
+  api-key:
+    description: 'Your secret API Key obtained from Currents dashboard'
+    required: false
+    default: ''
+  project-id:
+    description: 'Project ID obtained from Currents dashboard'
+    required: false
+    default: ''
+  previous-ci-build-id:
+    description: 'The ID of the previous CI build'
+    required: false
+    default: ''
 
 outputs:
   extra-pw-flags:

@@ -14,6 +14,7 @@ interface PostState {
 
 function getPostState(): PostState {
   return {
+    or8n: core.getState('or8n') === 'true',
     key: core.getState('key') ?? process.env.CURRENTS_RECORD_KEY,
     debug: core.getState('debug') === 'true',
     id: core.getState('id'),
@@ -27,6 +28,10 @@ function getPostState(): PostState {
 async function run(): Promise<void> {
   try {
     const state = getPostState()
+
+    if (state.or8n) {
+      return
+    }
 
     // Prepare cache set command with dynamic inputs
     const options: string[] = [

@@ -26184,6 +26184,7 @@ const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
 function getPostState() {
     return {
+        or8n: core.getState('or8n') === 'true',
         key: core.getState('key') ?? process.env.CURRENTS_RECORD_KEY,
         debug: core.getState('debug') === 'true',
         id: core.getState('id'),
@@ -26196,6 +26197,9 @@ function getPostState() {
 async function run() {
     try {
         const state = getPostState();
+        if (state.or8n) {
+            return;
+        }
         // Prepare cache set command with dynamic inputs
         const options = [
             `--preset last-run`,
