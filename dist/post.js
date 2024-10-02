@@ -26188,7 +26188,7 @@ function getPostState() {
         key: core.getState('key') ?? process.env.CURRENTS_RECORD_KEY,
         debug: core.getState('debug') === 'true',
         id: core.getState('id'),
-        paths: core.getState('paths'),
+        path: core.getState('path'),
         pwOutputDir: core.getState('pwOutputDir'),
         matrixIndex: core.getState('matrixIndex'),
         matrixTotal: core.getState('matrixTotal')
@@ -26211,6 +26211,9 @@ async function run() {
         }
         if (state.id) {
             options.push(`--id ${state.id}`);
+        }
+        if (state.path) {
+            options.push(`--path ${state.path}`);
         }
         if (state.pwOutputDir) {
             options.push(`--pw-output-dir ${state.pwOutputDir}`);

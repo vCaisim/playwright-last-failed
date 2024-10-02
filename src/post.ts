@@ -6,7 +6,7 @@ interface PostState {
   key?: string
   debug?: boolean
   id?: string
-  paths?: string
+  path?: string
   pwOutputDir?: string
   matrixIndex?: string
   matrixTotal?: string
@@ -18,7 +18,7 @@ function getPostState(): PostState {
     key: core.getState('key') ?? process.env.CURRENTS_RECORD_KEY,
     debug: core.getState('debug') === 'true',
     id: core.getState('id'),
-    paths: core.getState('paths'),
+    path: core.getState('path'),
     pwOutputDir: core.getState('pwOutputDir'),
     matrixIndex: core.getState('matrixIndex'),
     matrixTotal: core.getState('matrixTotal')
@@ -46,6 +46,10 @@ async function run(): Promise<void> {
 
     if (state.id) {
       options.push(`--id ${state.id}`)
+    }
+
+    if (state.path) {
+      options.push(`--path ${state.path}`)
     }
 
     if (state.pwOutputDir) {

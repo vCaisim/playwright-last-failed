@@ -26193,7 +26193,7 @@ function getInputs() {
         previousCIBuildId: core.getInput('previous-ci-build-id'),
         key: core.getInput('key') ?? process.env.CURRENTS_RECORD_KEY,
         id: core.getInput('id'),
-        paths: core.getInput('paths'),
+        path: core.getInput('path'),
         outputDir: core.getInput('output-dir'),
         pwOutputDir: core.getInput('pw-output-dir'),
         matrixIndex: core.getInput('matrix-index') || '1',
@@ -26235,7 +26235,7 @@ async function run() {
         core.saveState('key', inputs.key);
         core.saveState('debug', inputs.debug);
         core.saveState('id', inputs.id);
-        core.saveState('paths', inputs.paths || '');
+        core.saveState('path', inputs.path || '');
         core.saveState('pwOutputDir', inputs.pwOutputDir);
         core.saveState('matrixIndex', inputs.matrixIndex);
         core.saveState('matrixTotal', inputs.matrixTotal);

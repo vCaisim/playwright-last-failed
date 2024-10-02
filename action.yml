@@ -16,7 +16,7 @@ inputs:
     description: 'The ID the data is saved under in the cache'
     required: false
     default: ''
-  paths:
+  path:
     description: 'Comma-separated list of paths to cache'
     required: false
     default: ''
