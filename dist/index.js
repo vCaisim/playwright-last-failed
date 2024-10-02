@@ -26229,9 +26229,13 @@ async function run() {
             options.push(`--debug`);
         }
         const cacheGetCommand = `npx currents cache get ${options.join(' ')}`;
-        await exec.exec(cacheGetCommand);
-        const extraPwFlags = await exec.getExecOutput(`cat ${presetOutput}`);
-        core.setOutput('extra-pw-flags', extraPwFlags.stdout.trim());
+        const exitCode = await exec.exec(cacheGetCommand, [], {
+            ignoreReturnCode: true
+        });
+        if (exitCode === 0) {
+            const extraPwFlags = await exec.getExecOutput(`cat ${presetOutput}`);
+            core.setOutput('extra-pw-flags', extraPwFlags.stdout.trim());
+        }
         core.saveState('key', inputs.key);
         core.saveState('debug', inputs.debug);
         core.saveState('id', inputs.id);
