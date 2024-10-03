@@ -26214,7 +26214,8 @@ async function run() {
             `--preset last-run`,
             `--preset-output ${presetOutput}`,
             `--matrix-index ${inputs.matrixIndex}`,
-            `--matrix-total ${inputs.matrixTotal}`
+            `--matrix-total ${inputs.matrixTotal}`,
+            `--no-fail`
         ];
         if (inputs.key) {
             options.push(`--key ${inputs.key}`);
