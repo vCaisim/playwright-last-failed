@@ -56,7 +56,7 @@ async function run(): Promise<void> {
       `--preset-output ${presetOutput}`,
       `--matrix-index ${inputs.matrixIndex}`,
       `--matrix-total ${inputs.matrixTotal}`,
-      `--no-fail`
+      `--continue`
     ]
 
     if (inputs.key) {

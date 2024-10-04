@@ -26215,7 +26215,7 @@ async function run() {
             `--preset-output ${presetOutput}`,
             `--matrix-index ${inputs.matrixIndex}`,
             `--matrix-total ${inputs.matrixTotal}`,
-            `--no-fail`
+            `--continue`
         ];
         if (inputs.key) {
             options.push(`--key ${inputs.key}`);
