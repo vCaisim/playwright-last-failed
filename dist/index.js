@@ -26183,11 +26183,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
 const path = __importStar(__nccwpck_require__(6928));
+const utils_1 = __nccwpck_require__(1798);
 // Get inputs with types
 function getInputs() {
     return {
-        or8n: parseYamlBoolean(core.getInput('or8n')) ?? false,
-        debug: parseYamlBoolean(core.getInput('debug')) ?? false,
+        or8n: (0, utils_1.parseYamlBoolean)(core.getInput('or8n')) ?? false,
+        debug: (0, utils_1.parseYamlBoolean)(core.getInput('debug')) ?? false,
         apiKey: core.getInput('api-key') ?? process.env.CURRENTS_API_KEY,
         projectId: core.getInput('project-id') ?? process.env.CURRENTS_PROJECT_ID,
         previousCIBuildId: core.getInput('previous-ci-build-id'),
@@ -26203,7 +26204,7 @@ function getInputs() {
 async function run() {
     try {
         const inputs = getInputs();
-        await exec.exec('npm install -g @currents/cmd@beta');
+        await exec.exec('npm install -g @currents/cmd');
         core.saveState('or8n', inputs.or8n);
         if (inputs.or8n) {
             await or8n(inputs);
@@ -26250,9 +26251,10 @@ async function run() {
     }
 }
 async function or8n(inputs) {
-    const runAttempt = parseIntSafe(process.env.GITHUB_RUN_ATTEMPT, 1);
+    const runAttempt = (0, utils_1.parseIntSafe)(process.env.GITHUB_RUN_ATTEMPT, 1);
     if (runAttempt > 1) {
-        let previousBuildId = inputs.previousCIBuildId;
+        let previousBuildId = inputs.previousCIBuildId &&
+            (0, utils_1.parseAndTransformHtmlByTag)(inputs.previousCIBuildId);
         if (!previousBuildId) {
             const repository = process.env.GITHUB_REPOSITORY;
             const runId = process.env.GITHUB_RUN_ID;
@@ -26273,10 +26275,41 @@ async function or8n(inputs) {
         }
     }
 }
-const parseIntSafe = (value, defaultValue) => {
-    const parsed = Number(value);
-    return isNaN(parsed) ? defaultValue : parsed;
+run();
+
+
+/***/ }),
+
+/***/ 1798:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.defaultTransformMap = void 0;
+exports.parseAndTransformHtmlByTag = parseAndTransformHtmlByTag;
+exports.parseIntSafe = parseIntSafe;
+exports.parseYamlBoolean = parseYamlBoolean;
+exports.defaultTransformMap = {
+    incr: (content) => increment(parseIntSafe(content, 0)).toString(),
+    decr: (content) => decrement(parseIntSafe(content, 0)).toString()
 };
+function parseAndTransformHtmlByTag(htmlString, transformMap = exports.defaultTransformMap) {
+    const regex = /<(\w+)[^>]*>(.*?)<\/\1>/gs;
+    const transformContent = (input) => {
+        return input.replace(regex, (_match, tagName, content) => {
+            const transformFn = transformMap[tagName];
+            let transformedContent = transformFn ? transformFn(content) : content;
+            return transformedContent;
+        });
+    };
+    const transformedHtml = transformContent(htmlString);
+    return transformedHtml.replace(/<[^>]*>/g, '');
+}
+function parseIntSafe(value, defaultValue) {
+    const parsed = parseInt(value || '', 10);
+    return isNaN(parsed) ? defaultValue : parsed;
+}
 function parseYamlBoolean(value) {
     const trueValues = [
         'true',
@@ -26308,7 +26341,12 @@ function parseYamlBoolean(value) {
     }
     return null;
 }
-run();
+function increment(value) {
+    return value + 1;
+}
+function decrement(value) {
+    return value - 1;
+}
 
 
 /***/ }),

@@ -1,10 +1,14 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as path from 'path'
+import {
+  parseAndTransformHtmlByTag,
+  parseIntSafe,
+  parseYamlBoolean
+} from './utils'
 
 // Define interface for inputs
 interface ActionInputs {
-  // set
   or8n: boolean
   debug: boolean
   matrixIndex: string
@@ -41,7 +45,7 @@ async function run(): Promise<void> {
   try {
     const inputs = getInputs()
 
-    await exec.exec('npm install -g @currents/cmd@beta')
+    await exec.exec('npm install -g @currents/cmd')
 
     core.saveState('or8n', inputs.or8n)
     if (inputs.or8n) {
@@ -102,7 +106,9 @@ async function or8n(inputs: ActionInputs): Promise<void> {
   const runAttempt = parseIntSafe(process.env.GITHUB_RUN_ATTEMPT, 1)
 
   if (runAttempt > 1) {
-    let previousBuildId = inputs.previousCIBuildId
+    let previousBuildId =
+      inputs.previousCIBuildId &&
+      parseAndTransformHtmlByTag(inputs.previousCIBuildId)
     if (!previousBuildId) {
       const repository = process.env.GITHUB_REPOSITORY
       const runId = process.env.GITHUB_RUN_ID
@@ -129,47 +135,6 @@ async function or8n(inputs: ActionInputs): Promise<void> {
       core.setOutput('extra-pw-flags', '--last-failed')
     }
   }
-}
-
-const parseIntSafe = (
-  value: string | undefined,
-  defaultValue: number
-): number => {
-  const parsed = Number(value)
-  return isNaN(parsed) ? defaultValue : parsed
-}
-
-function parseYamlBoolean(value: string): boolean | null {
-  const trueValues = [
-    'true',
-    'True',
-    'TRUE',
-    'yes',
-    'Yes',
-    'YES',
-    'on',
-    'On',
-    'ON'
-  ]
-  const falseValues = [
-    'false',
-    'False',
-    'FALSE',
-    'no',
-    'No',
-    'NO',
-    'off',
-    'Off',
-    'OFF'
-  ]
-
-  if (trueValues.includes(value)) {
-    return true
-  } else if (falseValues.includes(value)) {
-    return false
-  }
-
-  return null
 }
 
 run()
