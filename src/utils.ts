@@ -1,28 +1,12 @@
-type TransformMap = {
-  [tag: string]: (content: string) => string
-}
+import * as _ from 'lodash'
 
-export const defaultTransformMap: TransformMap = {
-  incr: (content: string) => increment(parseIntSafe(content, 0)).toString(),
-  decr: (content: string) => decrement(parseIntSafe(content, 0)).toString()
-}
-
-export function parseAndTransformHtmlByTag(
-  htmlString: string,
-  transformMap: TransformMap = defaultTransformMap
-): string {
-  const regex = /<(\w+)[^>]*>(.*?)<\/\1>/gs
-
-  const transformContent = (input: string): string => {
-    return input.replace(regex, (_match, tagName, content) => {
-      const transformFn = transformMap[tagName]
-      let transformedContent = transformFn ? transformFn(content) : content
-      return transformedContent
-    })
+export function parseTemplate(value: string) {
+  try {
+    return _.template(value)({})
+  } catch (error) {
+    // There will be a ReferenceError if the template string will contain variables
+    return value
   }
-
-  const transformedHtml = transformContent(htmlString)
-  return transformedHtml.replace(/<[^>]*>/g, '')
 }
 
 export function parseIntSafe(
@@ -64,12 +48,4 @@ export function parseYamlBoolean(value: string): boolean | null {
   }
 
   return null
-}
-
-function increment(value: number) {
-  return value + 1
-}
-
-function decrement(value: number) {
-  return value - 1
 }

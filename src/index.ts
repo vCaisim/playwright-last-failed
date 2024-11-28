@@ -1,11 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as path from 'path'
-import {
-  parseAndTransformHtmlByTag,
-  parseIntSafe,
-  parseYamlBoolean
-} from './utils'
+import { parseIntSafe, parseTemplate, parseYamlBoolean } from './utils'
 
 // Define interface for inputs
 interface ActionInputs {
@@ -107,8 +103,7 @@ async function or8n(inputs: ActionInputs): Promise<void> {
 
   if (runAttempt > 1) {
     let previousBuildId =
-      inputs.previousCIBuildId &&
-      parseAndTransformHtmlByTag(inputs.previousCIBuildId)
+      inputs.previousCIBuildId && parseTemplate(inputs.previousCIBuildId)
     if (!previousBuildId) {
       const repository = process.env.GITHUB_REPOSITORY
       const runId = process.env.GITHUB_RUN_ID
