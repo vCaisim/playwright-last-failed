@@ -43421,7 +43421,6 @@ function getInputs() {
 async function run() {
     try {
         const inputs = getInputs();
-        await exec.exec('npm install -g @currents/cmd');
         core.saveState('or8n', inputs.or8n);
         if (inputs.or8n) {
             await or8n(inputs);
